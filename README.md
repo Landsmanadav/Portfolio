@@ -1,3 +1,5 @@
+<div dir="rtl">
+
 # 🎨 Nadav Landesman – תיק עבודות (Portfolio)
 
 > מערכת אינטראקטיבית להצגת מסך פתיחה “Slide to Enter” עם אנימציות מתקדמות, אפקט טקסט מוקלד וחוויית משתמש חלקה.
@@ -100,3 +102,5 @@ MIT © Nadav Landesman
 ### ליצירת קשר
 
 [GitHub של Nadav Landesman](https://github.com/Landsmanadav)
+
+</div>
