@@ -1,99 +1,102 @@
-# Portfolio אישי – Nadav Landesman
+# 🎨 Nadav Landesman – תיק עבודות (Portfolio)
 
-**תיאור כללי**
-זהו פרויקט Portfolio אישי מבוסס React ו-Vite, שנועד להציג את העבודה והכישורים שלי באמצעות דפי פרויקט ועיצובים אינטראקטיביים. כרגע בנינו את מסך ההתחלה (Entrance) עם אפקט Slide to Enter וטקסט מוקלד בסגנון מכונת כתיבה (typewriter effect) יחד עם אנימציות חלקות וניהול state מתוחכם.
-
----
-
-## טכנולוגיות עיקריות
-
-- React & Vite
-- SCSS מודולרי
-- Framer Motion לאנימציות
-- CSS Masking & requestAnimationFrame & AbortController
-- מבוסס Node.js (npm) לניהול תלותים
+> מערכת אינטראקטיבית להצגת מסך פתיחה “Slide to Enter” עם אנימציות מתקדמות, אפקט טקסט מוקלד וחוויית משתמש חלקה.
 
 ---
 
-## פיצ'רים נוכחיים
+## 📂 מבנה הפרויקט
 
-1. **Entrance Screen** – מסך פתיחה עם גרירת Slider לשחרור הכניסה.
-2. **Typewriter Effect** – הקלדת טקסט שורה אחר שורה עם סמן מהבהב.
-3. **Cursor Follower** – עיגול אינטראקטיבי העוקב אחרי העכבר בעדינות.
-
----
-
-## מבנה תיקיות
-
-```text
+```
 Portfolio/
-├── public/               # HTML סטטי ותוכן ציבורי
+├── public/
 ├── src/
+│   ├── assets/
+│   │   └── Helper.jsx            # פונקציות עזר (כמו פיצול טקסט)
 │   ├── components/
-│   │   ├── Intro/        # רכיבי מסך כניסה והטקסט המוקלד
-│   │   └── Shared/       # רכיבים משותפים (למשל CursorFollower)
-│   ├── layout/           # קומפוננטת Layout כללית
-│   ├── styles/           # SCSS גלובלי, משתנים ואנימציות
-│   ├── App.jsx           # נקודת הכניסה ל־React
-│   └── main.jsx          # אתחול Vite
-├── .gitignore            # סינון node_modules, build וכו'
-├── package.json          # תלויות וסקריפטים
-├── package-lock.json     # נעילת גרסאות תלותים
-├── vite.config.js        # קונפיגורציית Vite
-└── README.md             # מסמך זה
+│   │   ├── Intro/
+│   │   │   ├── Intro.jsx          # קומפוננטת הפתיחה הראשית
+│   │   │   ├── IntroHeader.jsx    # טקסט מוקלד ואנימציות
+│   │   │   ├── SlideToEnter.jsx   # סליידר כניסה
+│   │   │   └── SlideToEnter.scss  # עיצוב סליידר
+│   │   └── Shared/
+│   │       └── CursorFollower.jsx # עיגול עוקב אחר העכבר
+│   ├── layout/
+│   │   └── Layout.jsx             # תבנית (Layout) כללית
+│   ├── styles/
+│   │   ├── _animations.scss       # אנימציות ו-keyframes
+│   │   ├── _variables.scss        # משתני SCSS גלובליים
+│   │   └── global.scss            # איפוס סגנון ו-font
+│   ├── App.jsx
+│   ├── App.scss
+│   └── main.jsx
+├── index.html
+├── vite.config.js
+├── package.json
+└── README.md                      # ← כאן
 ```
 
 ---
 
-## התקנה והרצה
+## ✨ תכונות עיקריות
+
+- ⌨️ **Typewriter effect** לטקסט שורה אחרי שורה עם קו מהבהב
+- 🕹️ **Drag חכם** עם `useRef`, `AbortController` ו-`requestAnimationFrame`
+- 🎭 **CSS Mask** לחיתוך חלקי של טקסט בעת גרירה
+- 🎥 **אנימציות חלקות** לכל אלמנט באמצעות Framer Motion
+- 🖌️ **SCSS מודולרי** עם משתני עיצוב ואנימציות מותאמות
+- 🌀 **Cursor Follower** – עיגול אינטראקטיבי העוקב אחרי העכבר
+
+---
+
+## 🚀 התקנה והרצה
 
 ```bash
-git clone https://github.com/Landsmanadav/Portfolio.git
-cd Portfolio
+# התקנת תלותים
 npm install
+
+# הפעלה במצב פיתוח
 npm run dev
 ```
 
-יפעיל שרת פיתוח ב־[http://localhost:3000](http://localhost:3000)
+---
+
+## 🛠️ טכנולוגיות בשימוש
+
+- **React**
+- **Vite**
+- **SCSS**
+- **Framer Motion**
+- **CSS Masking**
+- **requestAnimationFrame**
+- **AbortController**
 
 ---
 
-## פיצ'רים בתכנון (To Do)
+## 🔭 בתכנון (To-Do)
 
-- אנימציית רקע מבוססת Canvas או Framer Motion על Scroll
-- התאמה למכשירים ניידים ו-touch gestures
-- דפי פרויקט נוספים עם תצוגת תמונות וקישורים
-- חיבור ל-backend (API או n8n) להדגמת Data-Driven Projects
-- אופטימיזציה ובדיקות ביצועים
-
----
-
-## כיצד לתרום
-
-1. צא לענף חדש מסגנון feature/…
-
-```bash
-git checkout -b feature/your-feature
-```
-
-2. הוסף או עדכן קוד, סגנונות או הנחיות.
-3. בצע commit עם הודעה ברורה:
-
-```bash
-git add .
-git commit -m "feat: תיאור הפיצ׳ר"
-```
-
-4. דחוף לענף שלך:
-
-```bash
-git push origin feature/your-feature
-```
-
-5. פתח Pull Request מ-GitHub לעבר main.
+- 🌈 אנימציית רקע דינמית באמצעות Canvas או Framer
+- 📱 תמיכה מלאה במובייל ו-touch drag
+- 📜 אנימציית Scroll פנימית בדפים הפנימיים
+- 🔄 אנימציית יציאה חלקה לדף הבית
+- 🔌 חיבור ל-backend או ל-n8n לקבלת תוכן דינמי
 
 ---
 
-## רישיון
+## 🤝 תרומה
+
+שאלות, הערות או שיפורים?
+
+1. פתח Issue
+2. שלח Pull Request
+
+---
+
+## 📄 רישיון
 
 MIT © Nadav Landesman
+
+---
+
+### ליצירת קשר
+
+[GitHub של Nadav Landesman](https://github.com/Landsmanadav)
