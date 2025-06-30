@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import "./SlideToEnter.scss";
 import { data } from "react-router-dom";
-import { getBouncyText } from "../../assets/helper";
+import { getBouncyText } from "../../utils/helper";
 
 function SlideToEnter({ onUnlock }) {
   const sliderRef = useRef(null);

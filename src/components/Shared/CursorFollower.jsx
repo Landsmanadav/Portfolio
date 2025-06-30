@@ -4,6 +4,7 @@ import useCanvasCursor from "../../customHooks/useCanvasCursor";
 
 const CursorFollower = () => {
   useCanvasCursor();
+
   return (
     <canvas
       className="pointer-events-none fixed inset-0 cursor-follower2"
@@ -11,4 +12,5 @@ const CursorFollower = () => {
     />
   );
 };
+
 export default CursorFollower;

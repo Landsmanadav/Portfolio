@@ -7,19 +7,18 @@ const useCanvasCursor = () => {
     init: function (e) {
       this.phase = e.phase || 0;
       this.offset = e.offset || 0;
-      this.frequency = e.frequency || 0.001;
-      this.amplitude = e.amplitude || 1;
+      this.frequency = e.frequency || 0.0015;
+      this.amplitude = e.amplitude || 85;
     },
     update: function () {
-      return (
-        (this.phase += this.frequency),
-        (e = this.offset + Math.sin(this.phase) * this.amplitude)
-      );
+      this.phase += this.frequency;
+      return this.offset + Math.sin(this.phase) * this.amplitude;
     },
     value: function () {
-      return e;
+      return this.offset + Math.sin(this.phase) * this.amplitude;
     },
   };
+
   function Line(e) {
     this.init(e || {});
   }
@@ -75,6 +74,32 @@ const useCanvasCursor = () => {
       ctx.closePath();
     },
   };
+
+  let ctx,
+    f,
+    pos = {},
+    lines = [],
+    E = {
+      debug: true,
+      friction: 0.5,
+      trails: 20,
+      size: 50,
+      dampening: 0.25,
+      tension: 0.98,
+    };
+
+  function Node() {
+    this.x = 0;
+    this.y = 0;
+    this.vy = 0;
+    this.vx = 0;
+  }
+
+  // קריאת update אחת בלבד, לכל mousemove/touchmove
+  function onMove() {
+    f.update();
+  }
+
   function onMousemove(e) {
     function o() {
       lines = [];
@@ -100,12 +125,13 @@ const useCanvasCursor = () => {
       o(),
       render();
   }
+
   function render() {
     if (ctx.running) {
       ctx.globalCompositeOperation = "source-over";
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.globalCompositeOperation = "lighter";
-      ctx.strokeStyle = "hsla(" + Math.round(f.update()) + ",50%,50%,0.2)";
+      ctx.strokeStyle = "hsla(" + Math.round(f.value()) + ",50%,50%,0.2)";
       ctx.lineWidth = 1;
       for (var e, t = 0; t < E.trails; t++) {
         (e = lines[t]).update();
@@ -115,39 +141,24 @@ const useCanvasCursor = () => {
       window.requestAnimationFrame(render);
     }
   }
+
   function resizeCanvas() {
     ctx.canvas.width = window.innerWidth - 20;
     ctx.canvas.height = window.innerHeight;
   }
-  var ctx,
-    f,
-    e = 0,
-    pos = {},
-    lines = [],
-    E = {
-      debug: true,
-      friction: 0.5,
-      trails: 20,
-      size: 50,
-      dampening: 0.25,
-      tension: 0.98,
-    };
-  function Node() {
-    this.x = 0;
-    this.y = 0;
-    this.vy = 0;
-    this.vx = 0;
-  }
+
   const renderCanvas = function () {
     ctx = document.getElementById("canvas").getContext("2d");
     ctx.running = true;
     ctx.frame = 1;
     f = new n({
-      phase: Math.random() * 2 * Math.PI,
+      phase: 0,
       amplitude: 85,
       frequency: 0.0015,
       offset: 285,
     });
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("touchmove", onMove);
     document.addEventListener("mousemove", onMousemove);
     document.addEventListener("touchstart", onMousemove);
     document.body.addEventListener("orientationchange", resizeCanvas);
@@ -163,10 +174,13 @@ const useCanvasCursor = () => {
     });
     resizeCanvas();
   };
+
   useEffect(() => {
     renderCanvas();
     return () => {
       ctx.running = false;
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("touchmove", onMove);
       document.removeEventListener("mousemove", onMousemove);
       document.removeEventListener("touchstart", onMousemove);
       document.body.removeEventListener("orientationchange", resizeCanvas);
