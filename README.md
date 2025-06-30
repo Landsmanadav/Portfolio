@@ -1,91 +1,99 @@
-# 🎮 Nadav Landesman Portfolio
+# Portfolio אישי – Nadav Landesman
 
-מערכת אינטראקטיבית שנבנתה ב-React להצגת מסך פתיחה מסוג "Slide to Enter", עם אפקטים חזותיים מתקדמים, טקסט מוקלד כמו מכונת כתיבה, וניהול מצבים ואירועים חכם עם אנימציות מדויקות.
+**תיאור כללי**
+זהו פרויקט Portfolio אישי מבוסס React ו-Vite, שנועד להציג את העבודה והכישורים שלי באמצעות דפי פרויקט ועיצובים אינטראקטיביים. כרגע בנינו את מסך ההתחלה (Entrance) עם אפקט Slide to Enter וטקסט מוקלד בסגנון מכונת כתיבה (typewriter effect) יחד עם אנימציות חלקות וניהול state מתוחכם.
 
 ---
 
-## 👢️ מבנה תיקיות
+## טכנולוגיות עיקריות
 
-```
-PORTFOLIO/
-├── public/
+- React & Vite
+- SCSS מודולרי
+- Framer Motion לאנימציות
+- CSS Masking & requestAnimationFrame & AbortController
+- מבוסס Node.js (npm) לניהול תלותים
+
+---
+
+## פיצ'רים נוכחיים
+
+1. **Entrance Screen** – מסך פתיחה עם גרירת Slider לשחרור הכניסה.
+2. **Typewriter Effect** – הקלדת טקסט שורה אחר שורה עם סמן מהבהב.
+3. **Cursor Follower** – עיגול אינטראקטיבי העוקב אחרי העכבר בעדינות.
+
+---
+
+## מבנה תיקיות
+
+```text
+Portfolio/
+├── public/               # HTML סטטי ותוכן ציבורי
 ├── src/
-│   ├── assets/
-│   │   └── Helper.jsx               # פונקציות עזר (כמו פיצול טקסט)
 │   ├── components/
-│   │   ├── Intro/
-│   │   │   ├── Intro.jsx            # קומפוננטת הפתיחה הראשית
-│   │   │   ├── IntroHeader.jsx      # טקסט מוקלד ואנימציות של שורות
-│   │   │   ├── SlideToEnter.jsx     # קומפוננטת הסליידר
-│   │   │   └── SlideToEnter.scss    # עיצוב הסליידר
-│   │   ├── Shared/
-│   │   │   └── CursorFollower.jsx   # אפקט עכבר אינטראקטיבי
-│   │   └── Homepage/                # דפים בהמשך
-│   ├── layout/
-│   │   └── Layout.jsx               # עטיפת Layout כללית לאפליקציה
-│   ├── styles/
-│   │   ├── _animations.scss         # keyframes ואנימציות כלליות
-│   │   ├── _variables.scss          # משתנים גלובליים (צבעים, spacing)
-│   │   └── global.scss              # עיצוב כללי כולל reset, font וכו'
-│   ├── App.jsx
-│   ├── App.scss
-│   └── main.jsx
-├── index.html
-├── vite.config.js
-└── README.md ← (כאן אנחנו)
+│   │   ├── Intro/        # רכיבי מסך כניסה והטקסט המוקלד
+│   │   └── Shared/       # רכיבים משותפים (למשל CursorFollower)
+│   ├── layout/           # קומפוננטת Layout כללית
+│   ├── styles/           # SCSS גלובלי, משתנים ואנימציות
+│   ├── App.jsx           # נקודת הכניסה ל־React
+│   └── main.jsx          # אתחול Vite
+├── .gitignore            # סינון node_modules, build וכו'
+├── package.json          # תלויות וסקריפטים
+├── package-lock.json     # נעילת גרסאות תלותים
+├── vite.config.js        # קונפיגורציית Vite
+└── README.md             # מסמך זה
 ```
 
 ---
 
-## ✨ תכונות עיקריות
-
-- ⌨️ **טקסט מוקלד** שורה אחר שורה עם קו מהבהב (typewriter effect)
-- 🎯 **Drag חכם** עם `useRef`, `AbortController` ו־ `requestAnimationFrame`
-- 💡 התאמת `maxOffset` לפי גודל הכפתור וה־padding
-- 🧼 מחיקת טקסט חלקית תוך כדי גרירה בעזרת CSS Mask
-- 🎥 אנימציות עם `Framer Motion` לכל שורה – כולל אפקטים ייחודיים
-- 👆 תמיכה בשימוש ב־SCSS מודולרי ואנימציות מותאמות אישית
-- 👛 עיגול אינטראקטיבי שעוקב אחרי תנועת העכבר (`CursorFollower`)
-
----
-
-## 🚧 To-Do (בשלבי פיתוח)
-
-- [ ] אנימציית רקע שמגיבה ל־scroll (Canvas או Framer)
-- [ ] תמיכה ב־mobile / טאץ׳ עם drag מותאם
-- [ ] Scroll אינטראקטיבי בדפים הפנימיים
-- [ ] מעבר חלק לדף הבית עם אנימציית יציאה
-- [ ] חיבור ל־backend או n8n לקבלת מידע דינמי
-
----
-
-## 💠 התקנה והרצה
+## התקנה והרצה
 
 ```bash
+git clone https://github.com/Landsmanadav/Portfolio.git
+cd Portfolio
 npm install
 npm run dev
 ```
 
+יפעיל שרת פיתוח ב־[http://localhost:3000](http://localhost:3000)
+
 ---
 
-## 🧪 שימוש בסיסי
+## פיצ'רים בתכנון (To Do)
 
-```jsx
-<SlideToEnter onUnlock={() => navigate("/home")} />
+- אנימציית רקע מבוססת Canvas או Framer Motion על Scroll
+- התאמה למכשירים ניידים ו-touch gestures
+- דפי פרויקט נוספים עם תצוגת תמונות וקישורים
+- חיבור ל-backend (API או n8n) להדגמת Data-Driven Projects
+- אופטימיזציה ובדיקות ביצועים
+
+---
+
+## כיצד לתרום
+
+1. צא לענף חדש מסגנון feature/…
+
+```bash
+git checkout -b feature/your-feature
 ```
 
+2. הוסף או עדכן קוד, סגנונות או הנחיות.
+3. בצע commit עם הודעה ברורה:
+
+```bash
+git add .
+git commit -m "feat: תיאור הפיצ׳ר"
+```
+
+4. דחוף לענף שלך:
+
+```bash
+git push origin feature/your-feature
+```
+
+5. פתח Pull Request מ-GitHub לעבר main.
+
 ---
 
-## 🧠 טכנולוגיות בשימוש
+## רישיון
 
-- React
-- SCSS
-- Framer Motion
-- Vite
-- CSS Masking
-- requestAnimationFrame
-- AbortController
-
----
-
-בהצלחה בפרויקט – ממש מרשים מה שבנית עד עכשיו 🚀
+MIT © Nadav Landesman
