@@ -1,3 +1,12 @@
 $primary-color: #ffffff;
-$background-color: #1a1a1a;
+$background-color: #222222;
 $text-color: #aaa;
+$breakpoint-xs: 480px;
+$breakpoint-sm: 600px;
+
+// בקובץ global.scss:
+@mixin max($breakpoint) {
+  @media (max-width: $breakpoint) {
+    @content;
+  }
+}

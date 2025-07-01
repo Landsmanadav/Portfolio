@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+import "./SeaweedCanvasBg.scss";
 
 class HueGenerator {
   constructor({
@@ -26,12 +27,18 @@ export default function SeaweedCanvasBg() {
   const hueGenRef = useRef(null);
   const tRef = useRef(0);
 
-  // נוסיף useRef כדי לאתחל את seaweeds מחדש ב־resize
+  // ננהל state פנימי עבור ה-amplitude הדינאמי
+  const amplitudeRef = useRef(1);
+  const targetAmplitudeRef = useRef(1);
+  const timeoutRef = useRef();
+
+  // seaweeds ופרמטרים, כמו קודם
   const seaweedsRef = useRef([]);
-  // נוסיף גם פרמטרים שישתנו ב־resize
   const paramsRef = useRef({});
 
   useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
@@ -44,14 +51,15 @@ export default function SeaweedCanvasBg() {
       canvas.style.height = `${H}px`;
       canvas.width = W * dpr;
       canvas.height = H * dpr;
-      ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
 
       paramsRef.current = {
         W,
         H,
         layers: 25,
-        amplitude: H * 0.07,
+        baseAmplitude: H * 0.05,
+        fastAmplitude: H * 0.01,
         waveLen: H * 1.5,
         lineLen: H * 1,
         strokeWidth: 1,
@@ -67,6 +75,10 @@ export default function SeaweedCanvasBg() {
           (paramsRef.current.regionWidth / (paramsRef.current.layers - 1)) * i,
         phaseOffset: Math.random() * Math.PI * 2,
       }));
+
+      // איפוס אמפליטודה להתחלה
+      amplitudeRef.current = paramsRef.current.baseAmplitude;
+      targetAmplitudeRef.current = paramsRef.current.baseAmplitude;
     }
 
     hueGenRef.current = new HueGenerator({
@@ -82,14 +94,19 @@ export default function SeaweedCanvasBg() {
       ((Math.round(hueGenRef.current.value()) % 360) + 360) % 360;
 
     function animate() {
-      tRef.current += 0.02; // תנועה תמידית של הגלים
+      tRef.current += 0.02;
+
+      // מעבר הדרגתי (אינטרפולציה) לאמפליטודה
+      amplitudeRef.current +=
+        (targetAmplitudeRef.current - amplitudeRef.current) * 0.012;
+
       renderSeaweed();
       requestAnimationFrame(animate);
     }
 
     function renderSeaweed() {
-      const { W, H, amplitude, waveLen, lineLen, strokeWidth } =
-        paramsRef.current;
+      const { W, H, waveLen, lineLen, strokeWidth } = paramsRef.current;
+      const amplitude = amplitudeRef.current;
 
       ctx.fillStyle = "#222222";
       ctx.fillRect(0, 0, W, H);
@@ -115,28 +132,36 @@ export default function SeaweedCanvasBg() {
     function onMove() {
       hueGenRef.current.update();
       hueCurrent = ((Math.round(hueGenRef.current.value()) % 360) + 360) % 360;
+
+      // על תנועה – האמפליטודה הופכת לקטנה
+      targetAmplitudeRef.current = paramsRef.current.fastAmplitude;
+
+      // נבטל טיימר קיים
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      // אחרי 400ms בלי תנועה – חזרה לערך הרגיל
+      timeoutRef.current = setTimeout(() => {
+        targetAmplitudeRef.current = paramsRef.current.baseAmplitude;
+      }, 400);
     }
 
     function onResize() {
       setupCanvas();
-      // לא מאתחלים t/hueGen, הגל והצבע ימשיכו כאילו לא קרה כלום!
-      // אפשר להפעיל renderSeaweed מיד כדי למנוע פליקר עד הפריים הבא
       renderSeaweed();
     }
 
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("touchmove", onMove);
-    window.addEventListener("resize", onResize);
+    document.addEventListener("mousemove", onMove, { signal });
+    document.addEventListener("touchmove", onMove, { signal });
+    window.addEventListener("resize", onResize, { signal });
 
     return () => {
-      window.removeEventListener("resize", onResize);
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("touchmove", onMove);
+      controller.abort();
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
   return (
     <canvas
+      id="background-canvas"
       ref={canvasRef}
       style={{
         position: "fixed",

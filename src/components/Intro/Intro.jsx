@@ -37,10 +37,30 @@ export default function Intro() {
 
   const [currentSection, setCurrentSection] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
+  const [hasFinishedTypingOnce, setHasFinishedTypingOnce] = useState(false);
+  const [hasTypedNow, setHasTypedNow] = useState(false);
 
-  const handleSectionChange = useCallback((sectionIndex) => {
-    setCurrentSection(sectionIndex);
+  // נקבל מ־ScrollIntro התראה מתי ההקלדה בסקשן האחרון הסתיימה
+  const handleTypingDone = useCallback(() => {
+    setHasFinishedTypingOnce(true);
+    setHasTypedNow(true); // להציג הפעם!
   }, []);
+
+  // בכל פעם שמגיעים לסקשן אחרון - אם כבר היה typing פעם, להראות מיד
+  React.useEffect(() => {
+    if (currentSection === lastIndex && hasFinishedTypingOnce) {
+      setHasTypedNow(true);
+    }
+  }, [currentSection, lastIndex, hasFinishedTypingOnce]);
+
+  const handleSectionChange = useCallback(
+    (sectionIndex) => {
+      setCurrentSection(sectionIndex);
+      // אם עברו אחורה – אל תציג מיד (רק אם כבר היה typing לפחות פעם אחת)
+      if (sectionIndex !== lastIndex) setHasTypedNow(false);
+    },
+    [lastIndex]
+  );
 
   const handleUnlock = useCallback(() => {
     setIsExiting(true);
@@ -51,8 +71,18 @@ export default function Intro() {
 
   return (
     <div className={`intro-wrapper ${isExiting ? "exit" : ""}`}>
-      <ScrollIntro sections={sections} onSectionChange={handleSectionChange} />
-      {currentSection === lastIndex && <SlideToEnter onUnlock={handleUnlock} />}
+      <ScrollIntro
+        sections={sections}
+        onSectionChange={handleSectionChange}
+        onTypingDone={
+          currentSection === lastIndex && !hasFinishedTypingOnce
+            ? handleTypingDone
+            : undefined
+        }
+      />
+      {currentSection === lastIndex && hasTypedNow && (
+        <SlideToEnter onUnlock={handleUnlock} />
+      )}
     </div>
   );
 }

@@ -148,7 +148,7 @@ const useCanvasCursor = () => {
   }
 
   const renderCanvas = function () {
-    ctx = document.getElementById("canvas").getContext("2d");
+    ctx = document.getElementById("cursor-canvas").getContext("2d");
     ctx.running = true;
     ctx.frame = 1;
     f = new n({

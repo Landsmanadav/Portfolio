@@ -3,7 +3,11 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useTypingEffect } from "../../customHooks/useTypingEffect";
 import "./ScrollIntro.scss";
 
-export default function ScrollIntro({ sections, onSectionChange }) {
+export default function ScrollIntro({
+  sections,
+  onSectionChange,
+  onTypingDone,
+}) {
   const sectionHeight = window.innerHeight;
 
   // Motion for scroll position
@@ -18,6 +22,9 @@ export default function ScrollIntro({ sections, onSectionChange }) {
     Array(sections.length).fill("")
   );
   const [reachedLast, setReachedLast] = useState(false);
+
+  // חדש: נוודא שמופעל רק פעם אחת
+  const [calledTypingDone, setCalledTypingDone] = useState(false);
 
   // Indicator visibility for scroll-down
   const [indicatorVisible, setIndicatorVisible] = useState(false);
@@ -42,9 +49,24 @@ export default function ScrollIntro({ sections, onSectionChange }) {
       });
       if (currentSection === sections.length - 1) {
         setReachedLast(true);
+        if (!calledTypingDone) {
+          onTypingDone?.();
+          setCalledTypingDone(true);
+        }
       }
     }
-  }, [typedLines, currentSection, sections, typedBuffers]);
+    // אם זזנו אחורה – לאפשר קריאה מחדש
+    if (currentSection !== sections.length - 1 && calledTypingDone) {
+      setCalledTypingDone(false);
+    }
+  }, [
+    typedLines,
+    currentSection,
+    sections,
+    typedBuffers,
+    onTypingDone,
+    calledTypingDone,
+  ]);
 
   // Reset indicator whenever we change section
   useEffect(() => {

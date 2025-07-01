@@ -7,8 +7,8 @@ const CursorFollower = () => {
 
   return (
     <canvas
-      className="pointer-events-none fixed inset-0 cursor-follower2"
-      id="canvas"
+      className="pointer-events-none fixed inset-0 cursor-follower"
+      id="cursor-canvas"
     />
   );
 };
