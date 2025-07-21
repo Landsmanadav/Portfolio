@@ -11,7 +11,7 @@ const Header = () => {
   } = useUi();
 
   return (
-    <header className="p-6 bg-gradient-to-r from-green-400 to-blue-500 text-white text-2xl font-bold shadow-lg">
+    <header className="נננ p-6 bg-gradient-to-r from-green-400 to-blue-500 text-white text-2xl font-bold shadow-lg">
       <span className="site-title">LANDSMAN PORTFOLIO</span>
       <div className="toggles">
         <button onClick={() => setShowCursor((prev) => !prev)}>
