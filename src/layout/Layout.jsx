@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-import "./Layout.scss";
 import CursorFollower from "../components/Shared/CursorFollower";
 import SeaweedCanvasBg from "../components/Shared/SeaweedCanvasBg";
 import { useRef } from "react";
