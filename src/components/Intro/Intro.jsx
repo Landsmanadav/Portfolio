@@ -65,7 +65,7 @@ export default function Intro() {
   const handleUnlock = useCallback(() => {
     setIsExiting(true);
     setTimeout(() => {
-      navigate("/main");
+      navigate("/homepage");
     }, 600);
   }, [navigate]);
 
