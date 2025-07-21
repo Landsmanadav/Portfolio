@@ -1,0 +1,60 @@
+@use "../../styles/_variables.scss" as *;
+.slider-wrapper {
+  @include max($breakpoint-sm) {
+    bottom: 5% !important;
+    transform-origin: 50% 50%;
+  }
+  .slider-container {
+    position: relative; // במקום absolute!
+    width: 320px;
+    height: 60px;
+    background: transparent;
+    border-radius: 50px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    display: flex;
+    margin-left: 5%;
+    align-items: center;
+    padding: 0 8px;
+    box-sizing: border-box;
+    transition: background 0.1s ease; // במקום all
+    @include max($breakpoint-sm) {
+      width: 90%;
+      margin: auto;
+    }
+
+    .slider-text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      pointer-events: none;
+      top: 25%;
+      span {
+        font-size: 1.5rem;
+      }
+    }
+
+    .slider-button {
+      width: 50px;
+      height: 50px;
+      background: $text-color;
+      border-radius: 50%;
+      cursor: grab;
+      transition: background 0.2s;
+      z-index: 3;
+      transform: translateZ(0);
+      will-change: transform;
+    }
+
+    .text-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background-color: $background-color;
+      z-index: 2;
+      border-radius: 30px;
+      margin: 10px, 0, 10px, 0;
+    }
+  }
+}
