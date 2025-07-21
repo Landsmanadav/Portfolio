@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useTypingEffect } from "../../customHooks/useTypingEffect";
 import "./ScrollIntro.scss";
@@ -14,83 +14,41 @@ export default function ScrollIntro({
   const scrollY = useMotionValue(0);
   const y = useTransform(scrollY, (v) => -v);
 
-  // Current section index
+  // State
   const [currentSection, setCurrentSection] = useState(0);
-
-  // Buffer for completed lines
   const [typedBuffers, setTypedBuffers] = useState(
     Array(sections.length).fill("")
   );
   const [reachedLast, setReachedLast] = useState(false);
-
-  // חדש: נוודא שמופעל רק פעם אחת
   const [calledTypingDone, setCalledTypingDone] = useState(false);
-
-  // Indicator visibility for scroll-down
   const [indicatorVisible, setIndicatorVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  // Typing effect for the active section
+  // Typing effect
   const activeLines = useMemo(
     () => [sections[currentSection]],
     [currentSection, sections]
   );
   const { typedLines } = useTypingEffect(activeLines, 50, 500);
 
-  // When a line finishes typing, buffer it and detect last
-  useEffect(() => {
-    if (
-      typedLines[0] === sections[currentSection] &&
-      !typedBuffers[currentSection]
-    ) {
-      setTypedBuffers((prev) => {
-        const next = [...prev];
-        next[currentSection] = sections[currentSection];
-        return next;
-      });
-      if (currentSection === sections.length - 1) {
-        setReachedLast(true);
-        if (!calledTypingDone) {
-          onTypingDone?.();
-          setCalledTypingDone(true);
-        }
-      }
+  // Touch handling
+  const touchStartY = useRef(0);
+  function handleTouchStart(e) {
+    touchStartY.current = e.touches[0].clientY;
+  }
+  function handleTouchEnd(e) {
+    const delta = e.changedTouches[0].clientY - touchStartY.current;
+    const threshold = 50;
+    if (delta < -threshold) {
+      handleWheel({ deltaY: 1, preventDefault: () => {} });
+    } else if (delta > threshold) {
+      handleWheel({ deltaY: -1, preventDefault: () => {} });
     }
-    // אם זזנו אחורה – לאפשר קריאה מחדש
-    if (currentSection !== sections.length - 1 && calledTypingDone) {
-      setCalledTypingDone(false);
-    }
-  }, [
-    typedLines,
-    currentSection,
-    sections,
-    typedBuffers,
-    onTypingDone,
-    calledTypingDone,
-  ]);
+  }
 
-  // Reset indicator whenever we change section
-  useEffect(() => {
-    setIndicatorVisible(false);
-  }, [currentSection]);
-
-  // Show scroll-down indicator 0.5s after ready, except on last
-  useEffect(() => {
-    const ready = reachedLast || Boolean(typedBuffers[currentSection]);
-    if (ready && currentSection < sections.length - 1) {
-      const timer = setTimeout(() => setIndicatorVisible(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [reachedLast, typedBuffers, currentSection, sections.length]);
-
-  // Notify parent on every section change
-  useEffect(() => {
-    onSectionChange?.(currentSection);
-  }, [currentSection, onSectionChange]);
-
-  // Prevent double-scroll while animating
-  const [isAnimating, setIsAnimating] = useState(false);
-  const handleWheel = (e) => {
-    e.preventDefault();
+  // Central scroll handler
+  function handleWheel(e) {
+    // e.preventDefault?.();
     if (isAnimating) return;
 
     const dir = e.deltaY > 0 ? 1 : -1;
@@ -115,13 +73,66 @@ export default function ScrollIntro({
       damping: 20,
       onComplete: () => setIsAnimating(false),
     });
-  };
+  }
+
+  // Buffer completed lines & detect last
+  useEffect(() => {
+    if (
+      typedLines[0] === sections[currentSection] &&
+      !typedBuffers[currentSection]
+    ) {
+      setTypedBuffers((prev) => {
+        const next = [...prev];
+        next[currentSection] = sections[currentSection];
+        return next;
+      });
+      if (currentSection === sections.length - 1 && !calledTypingDone) {
+        setReachedLast(true);
+        onTypingDone?.();
+        setCalledTypingDone(true);
+      }
+    }
+    if (currentSection !== sections.length - 1 && calledTypingDone) {
+      setCalledTypingDone(false);
+    }
+  }, [
+    typedLines,
+    currentSection,
+    sections,
+    typedBuffers,
+    onTypingDone,
+    calledTypingDone,
+  ]);
+
+  // Reset indicator on section change
+  useEffect(() => {
+    setIndicatorVisible(false);
+  }, [currentSection]);
+
+  // Show scroll-down indicator
+  useEffect(() => {
+    const ready = reachedLast || Boolean(typedBuffers[currentSection]);
+    if (ready && currentSection < sections.length - 1) {
+      const timer = setTimeout(() => setIndicatorVisible(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [reachedLast, typedBuffers, currentSection, sections.length]);
+
+  // Notify parent on each section change
+  useEffect(() => {
+    onSectionChange?.(currentSection);
+  }, [currentSection, onSectionChange]);
 
   return (
-    <div className="container" onWheel={handleWheel}>
+    <div
+      className="container"
+      style={{ height: sectionHeight }}
+      onWheel={handleWheel}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <motion.div className="inner" style={{ y }}>
         {sections.map((text, idx) => {
-          // determine what to show: buffered, full, or typing
           let display = "";
           if (reachedLast) {
             display = sections[idx];
@@ -156,17 +167,10 @@ export default function ScrollIntro({
                   className="scroll-indicator"
                   animate={{ y: [0, -5, 0] }}
                   transition={{ repeat: Infinity, duration: 1.5 }}
-                  onClick={() => {
-                    const next = currentSection + 1;
-                    onSectionChange?.(next);
-                    setCurrentSection(next);
-                    animate(scrollY, next * sectionHeight, {
-                      type: "spring",
-                      stiffness: 100,
-                      damping: 20,
-                      onComplete: () => setIsAnimating(false),
-                    });
-                  }}
+                  onClick={() => handleWheel({ deltaY: 1 })}
+                  onTouchStart={() =>
+                    handleWheel({ deltaY: 1, preventDefault: () => {} })
+                  }
                 >
                   SCROLL DOWN ↓
                 </motion.div>
