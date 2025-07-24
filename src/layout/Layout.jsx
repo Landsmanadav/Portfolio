@@ -9,8 +9,13 @@ export default function Layout() {
   console.log(showBackground);
   return (
     <div className="layout">
-      {showBackground && <SeaweedCanvasBg />}
-      {showCursor && <CursorFollower />}
+      <div style={{ visibility: showBackground ? "unset" : "hidden" }}>
+        <SeaweedCanvasBg />
+      </div>
+      <div style={{ visibility: showCursor ? "unset" : "hidden" }}>
+        <CursorFollower />
+      </div>
+
       <div className="page-content">
         <Outlet />
       </div>

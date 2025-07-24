@@ -108,8 +108,7 @@ export default function SeaweedCanvasBg() {
       const { W, H, waveLen, lineLen, strokeWidth } = paramsRef.current;
       const amplitude = amplitudeRef.current;
 
-      ctx.fillStyle = "#222222";
-      ctx.fillRect(0, 0, W, H);
+      ctx.clearRect(0, 0, W, H);
 
       ctx.lineWidth = strokeWidth;
       ctx.strokeStyle = `hsla(${hueCurrent},50%,50%,0.2)`;
