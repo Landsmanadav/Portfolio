@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import "./SeaweedCanvasBg.scss";
+import { useUi } from "@/context/UiContext";
 
 class HueGenerator {
   constructor({
@@ -23,6 +24,7 @@ class HueGenerator {
 }
 
 export default function SeaweedCanvasBg() {
+  const { frequency } = useUi();
   const canvasRef = useRef(null);
   const hueGenRef = useRef(null);
   const tRef = useRef(0);
@@ -35,6 +37,12 @@ export default function SeaweedCanvasBg() {
   // seaweeds ופרמטרים, כמו קודם
   const seaweedsRef = useRef([]);
   const paramsRef = useRef({});
+
+  useEffect(() => {
+    if (hueGenRef.current) {
+      hueGenRef.current.frequency = frequency;
+    }
+  }, [frequency]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -84,7 +92,7 @@ export default function SeaweedCanvasBg() {
     hueGenRef.current = new HueGenerator({
       phase: 0,
       offset: 285,
-      frequency: 0.0015,
+      frequency: frequency,
       amplitude: 85,
     });
 
@@ -98,7 +106,7 @@ export default function SeaweedCanvasBg() {
 
       // מעבר הדרגתי (אינטרפולציה) לאמפליטודה
       amplitudeRef.current +=
-        (targetAmplitudeRef.current - amplitudeRef.current) * 0.012;
+        (targetAmplitudeRef.current - amplitudeRef.current) * 0.005;
 
       renderSeaweed();
       requestAnimationFrame(animate);
@@ -107,6 +115,7 @@ export default function SeaweedCanvasBg() {
     function renderSeaweed() {
       const { W, H, waveLen, lineLen, strokeWidth } = paramsRef.current;
       const amplitude = amplitudeRef.current;
+      console.log(amplitude);
 
       ctx.clearRect(0, 0, W, H);
 
@@ -140,7 +149,7 @@ export default function SeaweedCanvasBg() {
       // אחרי 400ms בלי תנועה – חזרה לערך הרגיל
       timeoutRef.current = setTimeout(() => {
         targetAmplitudeRef.current = paramsRef.current.baseAmplitude;
-      }, 400);
+      }, 600);
     }
 
     function onResize() {

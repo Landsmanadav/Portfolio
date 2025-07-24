@@ -1,5 +1,11 @@
-import { useEffect } from "react";
+import { useUi } from "@/context/UiContext";
+import { useEffect, useRef } from "react";
+
 const useCanvasCursor = () => {
+  const { frequency } = useUi();
+  const fRef = useRef();
+
+  // הגדרת המחלקה
   function n(e) {
     this.init(e || {});
   }
@@ -76,7 +82,6 @@ const useCanvasCursor = () => {
   };
 
   let ctx,
-    f,
     pos = {},
     lines = [],
     E = {
@@ -95,9 +100,10 @@ const useCanvasCursor = () => {
     this.vx = 0;
   }
 
-  // קריאת update אחת בלבד, לכל mousemove/touchmove
   function onMove() {
-    f.update();
+    if (fRef.current) {
+      fRef.current.update();
+    }
   }
 
   function onMousemove(e) {
@@ -127,11 +133,12 @@ const useCanvasCursor = () => {
   }
 
   function render() {
-    if (ctx.running) {
+    if (ctx.running && fRef.current) {
       ctx.globalCompositeOperation = "source-over";
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.globalCompositeOperation = "lighter";
-      ctx.strokeStyle = "hsla(" + Math.round(f.value()) + ",50%,50%,0.2)";
+      ctx.strokeStyle =
+        "hsla(" + Math.round(fRef.current.value()) + ",50%,50%,0.2)";
       ctx.lineWidth = 1;
       for (var e, t = 0; t < E.trails; t++) {
         (e = lines[t]).update();
@@ -151,12 +158,14 @@ const useCanvasCursor = () => {
     ctx = document.getElementById("cursor-canvas").getContext("2d");
     ctx.running = true;
     ctx.frame = 1;
-    f = new n({
+
+    fRef.current = new n({
       phase: 0,
       amplitude: 85,
-      frequency: 0.0015,
+      frequency: frequency,
       offset: 285,
     });
+
     document.addEventListener("mousemove", onMove);
     document.addEventListener("touchmove", onMove);
     document.addEventListener("mousemove", onMousemove);
@@ -196,5 +205,12 @@ const useCanvasCursor = () => {
       });
     };
   }, []);
+
+  useEffect(() => {
+    if (fRef.current) {
+      fRef.current.frequency = frequency;
+    }
+  }, [frequency]);
 };
+
 export default useCanvasCursor;

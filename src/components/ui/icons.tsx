@@ -1,4 +1,12 @@
-import { Moon, Sun, Image, ImageOff, Pencil, PencilOff } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  Image,
+  ImageOff,
+  Pencil,
+  PencilOff,
+  Settings,
+} from "lucide-react";
 
 export const Icons = {
   moon: Moon,
@@ -7,4 +15,5 @@ export const Icons = {
   imageOff: ImageOff,
   cursor: Pencil,
   cursorOff: PencilOff,
+  settings: Settings,
 };

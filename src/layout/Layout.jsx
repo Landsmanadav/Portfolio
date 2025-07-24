@@ -6,7 +6,6 @@ import { useUi } from "../context/UiContext";
 
 export default function Layout() {
   const { showCursor, showBackground } = useUi();
-  console.log(showBackground);
   return (
     <div className="layout">
       <div style={{ visibility: showBackground ? "unset" : "hidden" }}>
