@@ -115,7 +115,6 @@ export default function SeaweedCanvasBg() {
     function renderSeaweed() {
       const { W, H, waveLen, lineLen, strokeWidth } = paramsRef.current;
       const amplitude = amplitudeRef.current;
-      console.log(amplitude);
 
       ctx.clearRect(0, 0, W, H);
 

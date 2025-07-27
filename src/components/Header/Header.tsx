@@ -80,10 +80,6 @@ const Header = () => {
                       id="colorFrequency"
                     />
                   </div>
-                  {/* <div className="grid  items-center gap-4">
-                    <Label htmlFor="colorFrequency">Color Frequency</Label>
-                    <Slider id="colorFrequency" />
-                  </div> */}
                 </div>
               </div>
             </PopoverContent>

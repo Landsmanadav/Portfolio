@@ -7,7 +7,7 @@ import "./Intro.scss";
 
 export default function Intro() {
   const navigate = useNavigate();
-  // מגדירים כאן את ה־sections בשביל שנוכל לחשב lastIndex דינמי
+
   const sections = [
     // Section 1
     `Welcome to my portfolio.\nScroll down for more content.`,
@@ -40,13 +40,11 @@ export default function Intro() {
   const [hasFinishedTypingOnce, setHasFinishedTypingOnce] = useState(false);
   const [hasTypedNow, setHasTypedNow] = useState(false);
 
-  // נקבל מ־ScrollIntro התראה מתי ההקלדה בסקשן האחרון הסתיימה
   const handleTypingDone = useCallback(() => {
     setHasFinishedTypingOnce(true);
-    setHasTypedNow(true); // להציג הפעם!
+    setHasTypedNow(true);
   }, []);
 
-  // בכל פעם שמגיעים לסקשן אחרון - אם כבר היה typing פעם, להראות מיד
   React.useEffect(() => {
     if (currentSection === lastIndex && hasFinishedTypingOnce) {
       setHasTypedNow(true);
@@ -56,7 +54,6 @@ export default function Intro() {
   const handleSectionChange = useCallback(
     (sectionIndex) => {
       setCurrentSection(sectionIndex);
-      // אם עברו אחורה – אל תציג מיד (רק אם כבר היה typing לפחות פעם אחת)
       if (sectionIndex !== lastIndex) setHasTypedNow(false);
     },
     [lastIndex]

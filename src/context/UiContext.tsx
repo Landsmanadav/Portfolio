@@ -9,6 +9,8 @@ type UiContextType = {
   setTheme: React.Dispatch<React.SetStateAction<boolean>>;
   frequency: number;
   setFrequency: React.Dispatch<React.SetStateAction<number>>;
+  cursorHover: boolean;
+  setCursorHover: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const UiContext = createContext<UiContextType | undefined>(undefined);
@@ -18,7 +20,8 @@ export const UiProvider = ({ children }: { children: ReactNode }) => {
   const [showBackground, setShowBackground] = useState(true);
   const [theme, setTheme] = useState(true);
   const [frequency, setFrequency] = useState(0.001);
-  // console.log(frequency);
+  const [cursorHover, setCursorHover] = useState(false);
+
   return (
     <UiContext.Provider
       value={{
@@ -30,6 +33,8 @@ export const UiProvider = ({ children }: { children: ReactNode }) => {
         setTheme,
         frequency,
         setFrequency,
+        cursorHover,
+        setCursorHover,
       }}
     >
       {children}

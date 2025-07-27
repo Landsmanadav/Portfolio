@@ -1,4 +1,3 @@
-"use client";
 import "./CursorFollower.scss";
 import useCanvasCursor from "../../customHooks/useCanvasCursor";
 
