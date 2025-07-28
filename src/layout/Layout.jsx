@@ -1,29 +1,40 @@
-import { Outlet } from "react-router-dom";
+import React from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import CursorFollower from "../components/Shared/CursorFollower";
 import SeaweedCanvasBg from "../components/Shared/SeaweedCanvasBg";
-import { useEffect, useRef } from "react";
-import { useUi } from "../context/UiContext";
 import SmoothFollower from "@/components/Shared/SmoothFollower";
+import { useUi } from "../context/UiContext";
 
 export default function Layout() {
-  const { showCursor, setShowCursor, showBackground, cursorHover } = useUi();
+  const { showCursor, showBackground, cursorHover } = useUi();
+  const location = useLocation();
+  const isDark = document.documentElement.classList.contains("dark");
+  const dotColor = isDark ? "#ffffff4d" : "#323232a6";
 
   return (
-    <div className="layout">
-      <div style={{ visibility: showBackground ? "unset" : "hidden" }}>
+    <div className="layout relative min-h-screen">
+      {/* רקע ים */}
+      <div className={showBackground ? "visible" : "invisible"}>
         <SeaweedCanvasBg />
       </div>
-      <div style={{ visibility: showCursor ? "unset" : "hidden" }}>
+
+      {/* עוקב עכבר מותאם */}
+      <div className={showCursor ? "visible" : "invisible"}>
         <CursorFollower />
       </div>
-      <div style={{ visibility: cursorHover ? "unset" : "hidden" }}>
-        <SmoothFollower />
+
+      {/* נקודה חלקה */}
+      <div style={{ display: cursorHover ? "unset" : "none" }}>
+        <SmoothFollower color={cursorHover ? dotColor : "transparent"} />
       </div>
 
+      {/* תוכן העמוד עם fade-in/fade-out */}
       <div className="page-content">
         <Outlet />
       </div>
-      {/* וכאן Footer בעתיד */}
+
+      {/* Footer בעתיד */}
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Label } from "@radix-ui/react-label";
-import { sliderToValue, valueToSlider } from "@/utils/helper";
+import { sliderToValue, valueToSlider } from "@/utils/Helper";
 const Header = () => {
   const {
     showCursor,

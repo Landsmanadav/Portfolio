@@ -1,120 +1,125 @@
-import { useState, useEffect, useRef } from "react";
+"use client";
 
-export default function SmoothFollower() {
-  const mousePosition = useRef({ x: 0, y: 0 });
+import { useEffect } from "react";
 
-  const dotPosition = useRef({ x: 0, y: 0 });
-  const borderDotPosition = useRef({ x: 0, y: 0 });
-
-  const [renderPos, setRenderPos] = useState({
-    dot: { x: 0, y: 0 },
-    border: { x: 0, y: 0 },
-  });
-  const [isHovering, setIsHovering] = useState(false);
-
-  const DOT_SMOOTHNESS = 0.2;
-  const BORDER_DOT_SMOOTHNESS = 0.1;
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mousePosition.current = { x: e.clientX, y: e.clientY };
-    };
-
-    const handleMouseEnter = () => setIsHovering(true);
-    const handleMouseLeave = () => setIsHovering(false);
-
-    // Add event listeners
-    window.addEventListener("mousemove", handleMouseMove);
-
-    const interactiveElements = document.querySelectorAll(
-      "a, button, img, input, textarea, select"
-    );
-    interactiveElements.forEach((element) => {
-      element.addEventListener("mouseenter", handleMouseEnter);
-      element.addEventListener("mouseleave", handleMouseLeave);
-    });
-
-    // Animation function for smooth movement
-    const animate = () => {
-      const lerp = (start: number, end: number, factor: number) => {
-        return start + (end - start) * factor;
-      };
-
-      dotPosition.current.x = lerp(
-        dotPosition.current.x,
-        mousePosition.current.x,
-        DOT_SMOOTHNESS
-      );
-      dotPosition.current.y = lerp(
-        dotPosition.current.y,
-        mousePosition.current.y,
-        DOT_SMOOTHNESS
-      );
-
-      borderDotPosition.current.x = lerp(
-        borderDotPosition.current.x,
-        mousePosition.current.x,
-        BORDER_DOT_SMOOTHNESS
-      );
-      borderDotPosition.current.y = lerp(
-        borderDotPosition.current.y,
-        mousePosition.current.y,
-        BORDER_DOT_SMOOTHNESS
-      );
-
-      setRenderPos({
-        dot: { x: dotPosition.current.x, y: dotPosition.current.y },
-        border: {
-          x: borderDotPosition.current.x,
-          y: borderDotPosition.current.y,
-        },
-      });
-
-      requestAnimationFrame(animate);
-    };
-
-    // Start animation loop
-    const animationId = requestAnimationFrame(animate);
-
-    // Clean up
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-
-      interactiveElements.forEach((element) => {
-        element.removeEventListener("mouseenter", handleMouseEnter);
-        element.removeEventListener("mouseleave", handleMouseLeave);
-      });
-
-      cancelAnimationFrame(animationId);
-    };
-  }, []);
-
-  if (typeof window === "undefined") return null;
-
-  return (
-    <div className="pointer-events-none fixed inset-0 z-50">
-      <div
-        className="absolute rounded-full dark:bg-foreground bg-foreground "
-        style={{
-          width: "8px",
-          height: "8px",
-          transform: "translate(-50%, -50%)",
-          left: `${renderPos.dot.x}px`,
-          top: `${renderPos.dot.y}px`,
-        }}
-      />
-
-      <div
-        className="absolute rounded-full border dark:border-foreground border-foreground "
-        style={{
-          width: isHovering ? "44px" : "28px",
-          height: isHovering ? "44px" : "28px",
-          transform: "translate(-50%, -50%)",
-          left: `${renderPos.border.x}px`,
-          top: `${renderPos.border.y}px`,
-          transition: "width 0.3s, height 0.3s",
-        }}
-      />
-    </div>
-  );
+interface SmoothFollowerProps {
+  color?: string;
 }
+
+const SmoothFollower: React.FC<SmoothFollowerProps> = ({
+  color = "foreground",
+}) => {
+  useEffect(() => {
+    let canvas: HTMLCanvasElement;
+    let context: CanvasRenderingContext2D | null;
+    let animationFrame: number;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let cursor = { x: width / 2, y: height / 2 };
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    class Dot {
+      position: { x: number; y: number };
+      width: number;
+      lag: number;
+
+      constructor(x: number, y: number, width: number, lag: number) {
+        this.position = { x, y };
+        this.width = width;
+        this.lag = lag;
+      }
+
+      moveTowards(x: number, y: number, context: CanvasRenderingContext2D) {
+        this.position.x += (x - this.position.x) / this.lag;
+        this.position.y += (y - this.position.y) / this.lag;
+        context.fillStyle = color;
+        context.beginPath();
+        context.arc(
+          this.position.x,
+          this.position.y,
+          this.width,
+          0,
+          2 * Math.PI
+        );
+        context.fill();
+        context.closePath();
+      }
+    }
+
+    const dot = new Dot(width / 2, height / 2, 10, 10);
+
+    const onMouseMove = (e: MouseEvent) => {
+      cursor.x = e.clientX;
+      cursor.y = e.clientY;
+    };
+
+    const onWindowResize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      if (canvas) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+    };
+
+    const updateDot = () => {
+      if (context) {
+        context.clearRect(0, 0, width, height);
+        dot.moveTowards(cursor.x, cursor.y, context);
+      }
+    };
+
+    const loop = () => {
+      updateDot();
+      animationFrame = requestAnimationFrame(loop);
+    };
+
+    const init = () => {
+      if (prefersReducedMotion.matches) {
+        console.log("Reduced motion enabled, cursor effect skipped.");
+        return;
+      }
+
+      canvas = document.createElement("canvas");
+      context = canvas.getContext("2d");
+      canvas.style.position = "fixed";
+      canvas.style.top = "0";
+      canvas.style.left = "0";
+      canvas.style.pointerEvents = "none";
+      canvas.width = width;
+      canvas.height = height;
+      document.body.appendChild(canvas);
+
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("resize", onWindowResize);
+      loop();
+    };
+
+    const destroy = () => {
+      if (canvas) canvas.remove();
+      cancelAnimationFrame(animationFrame);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("resize", onWindowResize);
+    };
+
+    prefersReducedMotion.onchange = () => {
+      if (prefersReducedMotion.matches) {
+        destroy();
+      } else {
+        init();
+      }
+    };
+
+    init();
+
+    return () => {
+      destroy();
+    };
+  }, [color]);
+
+  return null; // This component doesn't render any visible JSX
+};
+
+export default SmoothFollower;

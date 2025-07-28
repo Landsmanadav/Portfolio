@@ -21,7 +21,6 @@ export const UiProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState(true);
   const [frequency, setFrequency] = useState(0.001);
   const [cursorHover, setCursorHover] = useState(false);
-
   return (
     <UiContext.Provider
       value={{
