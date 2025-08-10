@@ -15,7 +15,7 @@ export const INTRO_SECTIONS = [
     "Full-Stack by title,",
     "creative problem-solver by heart.",
     "I build smooth interfaces with React,",
-    "and automate the boring stuff with,",
+    "and automate the boring stuff with",
     " Node.js, C#, and n8n.",
   ],
 

@@ -15,7 +15,7 @@ export default function Intro() {
   const navigate = useNavigate();
 
   const onUnlock = useCallback(() => {
-    navigate("/home");
+    navigate("/home", { state: { fromIntro: true } });
   }, [navigate]);
 
   const handleTypingEnd = useCallback(() => {
@@ -56,11 +56,30 @@ export default function Intro() {
     (e: React.WheelEvent<HTMLDivElement>) => moveSection(e.deltaY > 0 ? 1 : -1),
     [moveSection]
   );
+  const touchStartYRef = useRef<number | null>(null);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartYRef.current = e.touches[0].clientY;
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartYRef.current == null) return;
+    const dy = e.changedTouches[0].clientY - touchStartYRef.current;
+    const threshold = 50;
+    if (dy < -threshold) moveSection(1);
+    else if (dy > threshold) moveSection(-1);
+    touchStartYRef.current = null;
+  };
 
   const handleScrollClick = useCallback(() => moveSection(1), [moveSection]);
 
   return (
-    <div className="h-screen overflow-hidden relative" onWheel={handleWheel}>
+    <div
+      className="h-screen overflow-hidden relative"
+      onWheel={handleWheel}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       <motion.div style={{ y: scrollY }} className="flex flex-col">
         {sections.map((lines, idx) => (
           <div key={idx} className="h-screen w-full relative">

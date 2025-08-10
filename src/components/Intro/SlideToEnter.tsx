@@ -16,13 +16,11 @@ function SlideToEnter({
   const [offsetX, setOffsetX] = useState(0);
   const [show, setShow] = useState(false);
 
-  // Delay before showing
   useEffect(() => {
     const t = setTimeout(() => setShow(true), delay);
     return () => clearTimeout(t);
   }, [delay]);
 
-  // Drag logic
   useEffect(() => {
     if (!dragging) return;
     const ctrl = new AbortController();
@@ -34,18 +32,24 @@ function SlideToEnter({
     const buttonRect = button.getBoundingClientRect();
     const maxOffset = sliderRect.width - buttonRect.width - 12;
 
-    function onMouseMove(e: MouseEvent) {
-      const newX = e.clientX - sliderRect.left - buttonRect.width / 2;
+    const onMove = (clientX: number) => {
+      const newX = clientX - sliderRect.left - buttonRect.width / 2;
       const clamped = Math.max(0, Math.min(newX, maxOffset));
       setOffsetX(clamped);
       if (clamped >= maxOffset - 10) onUnlock();
-    }
+    };
 
-    function onMouseUp() {
+    const onMouseMove = (e: MouseEvent) => onMove(e.clientX);
+    const onTouchMove = (e: TouchEvent) => {
+      if (!e.touches[0]) return;
+      onMove(e.touches[0].clientX);
+      e.preventDefault();
+    };
+
+    const end = () => {
       setDragging(false);
       if (offsetX >= maxOffset - 10) onUnlock();
       else {
-        // animate back
         let x = offsetX;
         const step = () => {
           x -= 5;
@@ -55,10 +59,16 @@ function SlideToEnter({
         };
         requestAnimationFrame(step);
       }
-    }
+    };
 
     window.addEventListener("mousemove", onMouseMove, { signal });
-    window.addEventListener("mouseup", onMouseUp, { signal });
+    window.addEventListener("mouseup", end, { signal });
+    window.addEventListener("touchmove", onTouchMove, {
+      signal,
+      passive: false,
+    });
+    window.addEventListener("touchend", end, { signal });
+
     return () => ctrl.abort();
   }, [dragging, offsetX, onUnlock]);
 
@@ -74,8 +84,7 @@ function SlideToEnter({
       <div
         ref={sliderRef}
         className="
-          relative
-          h-[60px]
+          relative h-[60px]
           w-[90%] mx-auto
           sm:w-[320px] sm:ms-[5%] sm:mx-0
           bg-transparent
@@ -88,20 +97,13 @@ function SlideToEnter({
           transition-colors duration-100 ease-linear
         "
       >
-        {/* טקסט */}
         <motion.div
-          className="absolute top-[25%] w-full text-center pointer-events-none"
-          animate={{ y: [0, 0, 0] }}
-          transition={{ repeat: Infinity, duration: 0.5, ease: "easeInOut" }}
+          className="ms-4 absolute w-full text-center pointer-events-none"
+          // transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }}
         >
-          {getBouncyText("SLIDE TO ENTER ➔").map((span, i) => (
-            <span key={i} className="text-[1.5rem]">
-              {span.props.children}
-            </span>
-          ))}
+          {getBouncyText("SLIDE TO ENTER ➔")}
         </motion.div>
 
-        {/* מסיכה */}
         <div
           className="absolute top-[10px] bottom-[10px] left-0 bg-background z-[20] rounded-[30px]"
           style={{
@@ -109,7 +111,6 @@ function SlideToEnter({
           }}
         />
 
-        {/* כפתור גרירה */}
         <div
           ref={buttonRef}
           className="
@@ -122,6 +123,7 @@ function SlideToEnter({
             transition-colors duration-200
             z-[30]
             will-change-transform
+            touch-none
           "
           style={{ transform: `translateX(${offsetX}px)` }}
           onMouseDown={() => setDragging(true)}

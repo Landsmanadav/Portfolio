@@ -24,7 +24,7 @@ export default function Section({
     );
   }
 
-  const { typedLines, isTyping } = useTypingEffect(lines, 40, 500);
+  const { typedLines, isTyping } = useTypingEffect(lines, 10, 30);
 
   useEffect(() => {
     if (!isTyping && onTypingEnd) onTypingEnd();
